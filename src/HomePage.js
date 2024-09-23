@@ -6,9 +6,10 @@ import { getTopCryptos } from './api';
 const CryptoList = ({ cryptos }) => (
    <div>
       <div className="grid grid-cols-12 gap-4 mb-4 font-bold text-gray-600 border-b-2 pb-2">
-         <div className="col-span-4">Name</div>
-         <div className="col-span-4 text-right">Price</div>
-         <div className="col-span-4 text-right">Market Cap</div>
+         <div className="col-span-1">Rank</div>
+         <div className="col-span-5">Name</div>
+         <div className="col-span-3 text-right">Price</div>
+         <div className="col-span-3 text-right">Market Cap</div>
       </div>
       <motion.ul className="space-y-4">
          {cryptos.map((crypto, index) => (
@@ -20,13 +21,14 @@ const CryptoList = ({ cryptos }) => (
             className="bg-white rounded-lg shadow-md p-4"
          >
             <Link to={`/crypto/${crypto.id}`} className="grid grid-cols-12 gap-4 items-center">
-               <div className="col-span-4 flex items-center">
-               <span className="font-semibold mr-4 text-gray-500">{index + 1}</span>
-               <img src={crypto.image} alt={crypto.name} className="w-8 h-8 mr-2" />
-               <span className="font-bold">{crypto.name}</span>
+               <div className="col-span-1 font-semibold text-gray-500">{index + 1}</div>
+               <div className="col-span-5 flex items-center">
+                  <img src={crypto.image} alt={crypto.name} className="w-8 h-8 mr-2" />
+                  <span className="font-bold">{crypto.name}</span>
+                  <span className="ml-2 text-gray-500">({crypto.symbol.toUpperCase()})</span>
                </div>
-               <div className="col-span-4 text-right">${crypto.current_price.toFixed(2)}</div>
-               <div className="col-span-4 text-right">${crypto.market_cap.toLocaleString()}</div>
+               <div className="col-span-3 text-right">${crypto.current_price.toFixed(2)}</div>
+               <div className="col-span-3 text-right">${crypto.market_cap.toLocaleString()}</div>
             </Link>
          </motion.li>
          ))}
@@ -42,12 +44,12 @@ const HomePage = () => {
    useEffect(() => {
       const fetchData = async () => {
          try {
-         const response = await getTopCryptos();
-         setCryptos(response.data);
-         setLoading(false);
+            const response = await getTopCryptos();
+            setCryptos(response.data);
+            setLoading(false);
          } catch (err) {
-         setError('Failed to fetch data. Please try again later.');
-         setLoading(false);
+            setError('Failed to fetch data. Please try again later.');
+            setLoading(false);
          }
       };
 
@@ -59,7 +61,7 @@ const HomePage = () => {
 
    return (
       <div className="container mx-auto px-4 py-8">
-         <h1 className="text-4xl font-bold mb-8">Top 10 Cryptocurrencies</h1>
+         <h1 className="text-4xl font-bold mb-8">Top Cryptocurrencies</h1>
          <CryptoList cryptos={cryptos} />
       </div>
    );
