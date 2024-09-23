@@ -13,7 +13,7 @@ const Navbar = () => {
             </span>
          </Link>
          <ul className="flex space-x-6">
-            {['Home', 'Research', 'Community', 'Tools'].map((item) => (
+            {['Home', 'Research', 'Community', 'Tools', 'Using Web3', 'Glossary'].map((item) => (
                <motion.li 
                key={item} 
                whileHover={{ scale: 1.1 }}
