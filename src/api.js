@@ -1,17 +1,24 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://api.coingecko.com/api/v3';
+const BASE_URL = 'http://localhost:5000/api';
 
 export const getTopCryptos = () => 
-   axios.get(`${BASE_URL}/coins/markets`, {
-      params: {
-         vs_currency: 'usd',
-         order: 'market_cap_desc',
-         per_page: 10,
-         page: 1,
-         sparkline: false
-      }
-   });
+   axios.get(`${BASE_URL}/top-cryptos`);
 
 export const getCryptoDetails = (id) => 
-   axios.get(`${BASE_URL}/coins/${id}`);
+   axios.get(`${BASE_URL}/crypto/${id}`);
+
+export const getCryptoHistoricalData = async (id) => {
+   try {
+      const response = await axios.get(`${BASE_URL}/coins/${id}/market_chart`, {
+         params: {
+         vs_currency: 'usd',
+         days: 30
+         }
+      });
+      return response.data;
+   } catch (error) {
+      console.error('Error fetching historical data:', error.response ? error.response.data : error.message);
+      throw error;
+   }
+};
