@@ -1,3 +1,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+   scroll-behavior: smooth;
+}
+
+body {
+   overflow-y: scroll;
+}
+
+.sticky-nav-container {
+   position: sticky;
+   top: 0;
+   z-index: 1000;
+}
+
+.sticky-nav-container::after {
+   content: '';
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   height: 4px;
+   background: linear-gradient(to right, #3b82f6, #eab308);
+   transform: scaleX(0);
+   transition: transform 0.3s ease;
+}
+
+.sticky-nav-container.is-sticky::after {
+   transform: scaleX(1);
+}
+
+.sticky-nav-container nav {
+   transition: all 0.3s ease;
+}
+
+.sticky-nav-container.is-sticky nav {
+   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
