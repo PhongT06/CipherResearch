@@ -116,15 +116,20 @@ const CryptoDetailPage = () => {
       }).format(date);
    };
 
+   const formatPercentage = (percentage) => {
+      return percentage.toFixed(2) + '%';
+   };
+
    return (
       <div className="crypto-detail-page">
          <motion.header
+            className="crypto-header"
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
          >
             <img src={crypto.image.large} alt={crypto.name} className="crypto-logo" />
-            <h1>{crypto.name} ({crypto.symbol.toUpperCase()})</h1>
+            <h1 className="crypto-name">{crypto.name} ({crypto.symbol.toUpperCase()})</h1>
          </motion.header>
 
          <div className="content-container">
@@ -171,15 +176,59 @@ const CryptoDetailPage = () => {
                      transition={{ duration: 0.5, delay: 0.2 }}
                   >
                      <h2>Key Stats</h2>
-                     <p>Current Price: {formatPrice(crypto.market_data.current_price.usd)}</p>
-                     <p>24h Change: 
-                        <span className={crypto.market_data.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}>
-                           {' '}{crypto.market_data.price_change_percentage_24h.toFixed(2)}%
-                           {crypto.market_data.price_change_percentage_24h >= 0 ? ' ↑' : ' ↓'}
-                        </span>
-                     </p>
-                     <p>Market Cap: {formatPrice(crypto.market_data.market_cap.usd)}</p>
-                     <p>24h Volume: {formatPrice(crypto.market_data.total_volume.usd)}</p>
+                     <div className="grid grid-cols-2 gap-4">
+                        <div>
+                           <p className="text-sm text-gray-500">Current Price</p>
+                           <p className="text-lg font-bold">{formatPrice(crypto.market_data.current_price.usd)}</p>
+                        </div>
+                        <div>
+                           <p className="text-sm text-gray-500">24h Change</p>
+                           <p className={`text-lg font-bold ${crypto.market_data.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                              {formatPercentage(crypto.market_data.price_change_percentage_24h)}
+                              {crypto.market_data.price_change_percentage_24h >= 0 ? ' ↑' : ' ↓'}
+                           </p>
+                        </div>
+                        <div>
+                           <p className="text-sm text-gray-500">Market Cap</p>
+                           <p className="text-lg font-bold">{formatPrice(crypto.market_data.market_cap.usd)}</p>
+                        </div>
+                        <div>
+                           <p className="text-sm text-gray-500">24h Volume</p>
+                           <p className="text-lg font-bold">{formatPrice(crypto.market_data.total_volume.usd)}</p>
+                        </div>
+                     </div>
+                  </motion.div>
+
+                  <motion.div 
+                     className="links-card mt-4"
+                     initial={{ opacity: 0, x: -50 }}
+                     whileInView={{ opacity: 1, x: 0 }}
+                     viewport={{ once: true }}
+                     transition={{ duration: 0.5, delay: 0.4 }}
+                  >
+                     <h2>Links</h2>
+                     <div className="grid grid-cols-2 gap-4">
+                        {crypto.links.homepage[0] && (
+                           <a href={crypto.links.homepage[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                              Official Website
+                           </a>
+                        )}
+                        {crypto.links.blockchain_site[0] && (
+                           <a href={crypto.links.blockchain_site[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                              Blockchain Explorer
+                           </a>
+                        )}
+                        {crypto.links.official_forum_url[0] && (
+                           <a href={crypto.links.official_forum_url[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                              Official Forum
+                           </a>
+                        )}
+                        {crypto.links.subreddit_url && (
+                           <a href={crypto.links.subreddit_url} target="_blank" rel="noopener noreferrer" className="link-button">
+                              Reddit
+                           </a>
+                        )}
+                     </div>
                   </motion.div>
                </div>
             </div>
@@ -187,25 +236,25 @@ const CryptoDetailPage = () => {
                <InfoSection title="About" content={crypto.description.en} />
                {contentfulData && (
                   <>
-                  <InfoSection title="Educational Content" content={contentfulData.educationalContent || 'Coming soon...'} />
-                  <InfoSection title={`Using ${crypto.name}`} content={contentfulData.using || 'Coming soon...'} />
-                  <InfoSection title={`Staking ${crypto.name}`} content={contentfulData.staking || 'Coming soon...'} />
+                     <InfoSection title="Educational Content" content={contentfulData.educationalContent || 'Coming soon...'} />
+                     <InfoSection title={`Using ${crypto.name}`} content={contentfulData.using || 'Coming soon...'} />
+                     <InfoSection title={`Staking ${crypto.name}`} content={contentfulData.staking || 'Coming soon...'} />
                   </>
                )}
                {contentfulData && contentfulData.videoLinks && contentfulData.videoLinks.length > 0 && (
                   <InfoSection
-                  title="Helpful Videos"
-                  content={
-                     <ul>
-                        {contentfulData.videoLinks.map((link, index) => (
-                        <li key={index}>
-                           <a href={link.url} target="_blank" rel="noopener noreferrer">
-                              {link.title}
-                           </a>
-                        </li>
-                        ))}
-                     </ul>
-                  }
+                     title="Helpful Videos"
+                     content={
+                        <ul>
+                           {contentfulData.videoLinks.map((link, index) => (
+                              <li key={index}>
+                                 <a href={link.url} target="_blank" rel="noopener noreferrer">
+                                    {link.title}
+                                 </a>
+                              </li>
+                           ))}
+                        </ul>
+                     }
                   />
                )}
             </div>

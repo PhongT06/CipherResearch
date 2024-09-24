@@ -12,10 +12,24 @@ header {
    margin-bottom: 2rem;
 }
 
+.crypto-header {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   margin-bottom: 2rem;
+}
+
 .crypto-logo {
    width: 100px;
    height: 100px;
    margin-bottom: 1rem;
+}
+
+.crypto-name {
+   font-size: 2.5rem;
+   color: #2c3e50;
+   margin: 0;
+   text-align: center;
 }
 
 h1 {
@@ -42,7 +56,7 @@ h1 {
    height: fit-content;
 }
 
-.price-chart, .key-stats, .info-section {
+.price-chart, .key-stats, .info-section, .links-card {
    background-color: #fff;
    border-radius: 10px;
    padding: 1.5rem;
@@ -50,7 +64,7 @@ h1 {
    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.price-chart:hover, .key-stats:hover, .info-section:hover {
+.price-chart:hover, .key-stats:hover, .info-section:hover, .links-card:hover {
    transform: translateY(-5px);
    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
@@ -113,7 +127,8 @@ a:hover {
 /* Add some futuristic accents */
 .price-chart::before,
 .key-stats::before,
-.info-section::before {
+.info-section::before,
+.links-card::before {
    content: '';
    position: absolute;
    top: 0;
@@ -142,4 +157,42 @@ body {
 
 .error {
    color: #EF4444;
+}
+
+/* New styles for Key Stats and Links card */
+.key-stats .grid, .links-card .grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 1rem;
+}
+
+.key-stats .text-sm {
+   font-size: 0.875rem;
+   color: #6c757d;
+   margin-bottom: 0.25rem;
+}
+
+.key-stats .text-lg {
+   font-size: 1.125rem;
+   font-weight: bold;
+}
+
+.link-button {
+   display: inline-block;
+   padding: 0.5rem 1rem;
+   background-color: #3498db;
+   color: #fff;
+   border-radius: 5px;
+   text-decoration: none;
+   transition: background-color 0.3s ease;
+   text-align: center;
+   font-weight: bold;
+}
+
+.link-button:hover {
+   background-color: #2980b9;
+}
+
+.mt-4 {
+   margin-top: 1rem;
 }
