@@ -63,9 +63,29 @@ h2 {
    margin-bottom: 1rem;
 }
 
+.text-green-500 {
+   color: #10B981;
+}
+
+.text-red-500 {
+   color: #EF4444;
+}
+
+.key-stats .text-green-500,
+.key-stats .text-red-500 {
+   font-weight: bold;
+}
+
 .key-stats p {
    margin: 0.5rem 0;
    font-size: 1rem;
+   display: flex;
+   justify-content: space-between;
+}
+
+.key-stats p::after {
+   content: attr(data-value);
+   font-weight: bold;
 }
 
 .info-section .content {
