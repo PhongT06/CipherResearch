@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -39,6 +39,9 @@ const CryptoDetailPage = () => {
    const [historicalData, setHistoricalData] = useState([]);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
+   
+   const leftColumnRef = useRef(null);
+   const rightColumnRef = useRef(null);
 
    useEffect(() => {
       const fetchData = async () => {
@@ -56,7 +59,7 @@ const CryptoDetailPage = () => {
                setHistoricalData(historicalResponse.prices.map(([timestamp, price]) => ({
                   date: new Date(timestamp),
                   price: price
-               })).filter(item => !isNaN(item.date.getTime()))); // Filter out invalid dates
+               })).filter(item => !isNaN(item.date.getTime())));
             } else {
                console.error('Invalid historical data structure:', historicalResponse);
                setError('Failed to process historical data. Please try again later.');
@@ -73,6 +76,23 @@ const CryptoDetailPage = () => {
       fetchData();
    }, [id]);
 
+   useEffect(() => {
+      const handleResize = () => {
+         if (leftColumnRef.current && rightColumnRef.current) {
+            const leftHeight = leftColumnRef.current.offsetHeight;
+            const rightHeight = rightColumnRef.current.offsetHeight;
+            leftColumnRef.current.style.height = `${Math.max(leftHeight, rightHeight)}px`;
+         }
+      };
+
+      window.addEventListener('resize', handleResize);
+      handleResize();
+
+      return () => {
+         window.removeEventListener('resize', handleResize);
+      };
+   }, [crypto, contentfulData]);
+
    if (loading) return <div className="loading">Loading...</div>;
    if (error) return <div className="error">{error}</div>;
    if (!crypto) return <div className="no-data">No data available.</div>;
@@ -88,7 +108,7 @@ const CryptoDetailPage = () => {
 
    const formatDate = (date) => {
       if (!(date instanceof Date) || isNaN(date.getTime())) {
-         return '';  // Return an empty string for invalid dates
+         return '';
       }
       return new Intl.DateTimeFormat('en-US', {
          month: 'short',
@@ -108,60 +128,62 @@ const CryptoDetailPage = () => {
          </motion.header>
 
          <div className="content-container">
-            <div className="left-column">
-               <motion.div 
-                  className="price-chart"
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
-               >
-                  <h2>{crypto.name} Price Chart</h2>
-                  <ResponsiveContainer width="100%" height={300}>
-                     <LineChart data={historicalData}>
-                        <XAxis 
-                           dataKey="date" 
-                           tickFormatter={formatDate}
-                           domain={['auto', 'auto']}
-                        />
-                        <YAxis 
-                           domain={['auto', 'auto']}
-                           tickFormatter={formatPrice}
-                        />
-                        <Tooltip 
-                           formatter={(value) => [formatPrice(value), 'Price']}
-                           labelFormatter={(label) => `Date: ${formatDate(new Date(label))}`}
-                        />
-                        <Line 
-                           type="monotone" 
-                           dataKey="price" 
-                           stroke="#8884d8" 
-                           dot={false}
-                           strokeWidth={2}
-                        />
-                     </LineChart>
-                  </ResponsiveContainer>
-               </motion.div>
-               <motion.div 
-                  className="key-stats"
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-               >
-                  <h2>Key Stats</h2>
-                  <p>Current Price: {formatPrice(crypto.market_data.current_price.usd)}</p>
-                  <p>24h Change: 
-                     <span className={crypto.market_data.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}>
-                        {' '}{crypto.market_data.price_change_percentage_24h.toFixed(2)}%
-                        {crypto.market_data.price_change_percentage_24h >= 0 ? ' ↑' : ' ↓'}
-                     </span>
-                  </p>
-                  <p>Market Cap: {formatPrice(crypto.market_data.market_cap.usd)}</p>
-                  <p>24h Volume: {formatPrice(crypto.market_data.total_volume.usd)}</p>
-               </motion.div>
+            <div className="left-column" ref={leftColumnRef}>
+               <div className="sticky-wrapper">
+                  <motion.div 
+                     className="price-chart"
+                     initial={{ opacity: 0, x: -50 }}
+                     whileInView={{ opacity: 1, x: 0 }}
+                     viewport={{ once: true }}
+                     transition={{ duration: 0.5 }}
+                  >
+                     <h2>{crypto.name} Price Chart</h2>
+                     <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={historicalData}>
+                           <XAxis 
+                              dataKey="date" 
+                              tickFormatter={formatDate}
+                              domain={['auto', 'auto']}
+                           />
+                           <YAxis 
+                              domain={['auto', 'auto']}
+                              tickFormatter={formatPrice}
+                           />
+                           <Tooltip 
+                              formatter={(value) => [formatPrice(value), 'Price']}
+                              labelFormatter={(label) => `Date: ${formatDate(new Date(label))}`}
+                           />
+                           <Line 
+                              type="monotone" 
+                              dataKey="price" 
+                              stroke="#8884d8" 
+                              dot={false}
+                              strokeWidth={2}
+                           />
+                        </LineChart>
+                     </ResponsiveContainer>
+                  </motion.div>
+                  <motion.div 
+                     className="key-stats"
+                     initial={{ opacity: 0, x: -50 }}
+                     whileInView={{ opacity: 1, x: 0 }}
+                     viewport={{ once: true }}
+                     transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                     <h2>Key Stats</h2>
+                     <p>Current Price: {formatPrice(crypto.market_data.current_price.usd)}</p>
+                     <p>24h Change: 
+                        <span className={crypto.market_data.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}>
+                           {' '}{crypto.market_data.price_change_percentage_24h.toFixed(2)}%
+                           {crypto.market_data.price_change_percentage_24h >= 0 ? ' ↑' : ' ↓'}
+                        </span>
+                     </p>
+                     <p>Market Cap: {formatPrice(crypto.market_data.market_cap.usd)}</p>
+                     <p>24h Volume: {formatPrice(crypto.market_data.total_volume.usd)}</p>
+                  </motion.div>
+               </div>
             </div>
-            <div className="right-column">
+            <div className="right-column" ref={rightColumnRef}>
                <InfoSection title="About" content={crypto.description.en} />
                {contentfulData && (
                   <>
