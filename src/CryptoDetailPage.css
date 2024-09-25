@@ -52,7 +52,7 @@ h1 {
 
 .sticky-wrapper {
    position: sticky;
-   top: 88px; /* Adjust this value to match your navbar height */
+   top: 110px; /* Adjust this value to match your navbar height */
    height: fit-content;
 }
 
@@ -62,6 +62,8 @@ h1 {
    padding: 1.5rem;
    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
    transition: transform 0.3s ease, box-shadow 0.3s ease;
+   position: relative;
+   overflow: hidden;
 }
 
 .price-chart:hover, .key-stats:hover, .info-section:hover, .links-card:hover {
@@ -138,6 +140,15 @@ a:hover {
    background: linear-gradient(90deg, #3498db, #2ecc71);
    border-top-left-radius: 10px;
    border-top-right-radius: 10px;
+   opacity: 0;
+   transition: opacity 0.3s ease;
+}
+
+.price-chart:hover::before,
+.key-stats:hover::before,
+.info-section:hover::before,
+.links-card:hover::before {
+   opacity: 1;
 }
 
 /* Add a subtle background pattern for a tech feel */

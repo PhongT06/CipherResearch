@@ -39,3 +39,73 @@ body {
 .sticky-nav-container.is-sticky nav {
    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
+/* Updated styles for HomePage */
+.crypto-list-container {
+   padding-top: 2rem;
+   max-width: 1200px;
+   margin: 0 auto;
+}
+
+.crypto-list-header {
+   position: sticky;
+   top: 118px; /* Adjust this value to match your navbar height */
+   background-color: white;
+   z-index: 10;
+   padding: 1rem 0;
+   transition: box-shadow 0.3s ease;
+}
+
+.crypto-list-header.is-sticky {
+   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.crypto-list-header-content {
+   padding: 0 1rem;
+}
+
+.crypto-list-grid {
+   display: grid;
+   grid-template-columns: 0.5fr 2.5fr 1.5fr 1.5fr 2.5fr 1.5fr;
+   gap: 1rem;
+   align-items: center;
+}
+
+.text-right { text-align: right; }
+
+.crypto-list-item {
+   background-color: white;
+   border-radius: 0.5rem;
+   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+   padding: 1rem;
+   margin-bottom: 1rem;
+}
+
+.crypto-list-item:hover {
+   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+   transition: box-shadow 0.3s ease;
+}
+
+.crypto-price-positive { color: #10B981; }
+.crypto-price-negative { color: #EF4444; }
+
+.crypto-image {
+   width: 2rem;
+   height: 2rem;
+   margin-right: 0.5rem;
+}
+
+.crypto-list-title {
+   margin-bottom: 1rem;
+   padding-left: 1rem;
+}
+
+.crypto-list {
+   padding-top: 1rem;
+}
+
+/* Ensure header text aligns with list content */
+.crypto-list-header .crypto-list-grid > div,
+.crypto-list-item .crypto-list-grid > div {
+   padding: 0 0.5rem;
+}
