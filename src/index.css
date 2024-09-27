@@ -109,3 +109,16 @@ body {
 .crypto-list-item .crypto-list-grid > div {
    padding: 0 0.5rem;
 }
+
+@keyframes priceChange {
+   0% {
+      background-color: rgba(255, 255, 0, 0.5);
+   }
+   100% {
+      background-color: transparent;
+   }
+}
+
+.price-changed {
+   animation: priceChange 1s ease-out;
+}

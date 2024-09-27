@@ -207,3 +207,19 @@ body {
 .mt-4 {
    margin-top: 1rem;
 }
+
+.live-price {
+   font-size: 1.2rem;
+   font-weight: bold;
+   color: #2c3e50;
+   margin-bottom: 1rem;
+   padding: 0.5rem;
+   background-color: #f8f9fa;
+   border-radius: 5px;
+   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+   transition: background-color 0.3s ease;
+}
+
+.live-price:hover {
+   background-color: #e9ecef;
+}

@@ -21,7 +21,7 @@ const InfoSection = ({ title, content }) => (
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.5 }}
    >
       <h2>{title}</h2>
       <div className="content">
@@ -39,6 +39,7 @@ const CryptoDetailPage = () => {
    const [historicalData, setHistoricalData] = useState([]);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
+   const [livePrice, setLivePrice] = useState(null);
    
    const leftColumnRef = useRef(null);
    const rightColumnRef = useRef(null);
@@ -54,6 +55,7 @@ const CryptoDetailPage = () => {
             
             setCrypto(apiResponse.data);
             setContentfulData(contentfulResponse);
+            setLivePrice(apiResponse.data.market_data.current_price.usd);
             
             if (historicalResponse && historicalResponse.prices) {
                setHistoricalData(historicalResponse.prices.map(([timestamp, price]) => ({
@@ -74,6 +76,19 @@ const CryptoDetailPage = () => {
       };
 
       fetchData();
+
+      // Set up interval for live price updates
+      const livePriceInterval = setInterval(async () => {
+         try {
+            const response = await getCryptoDetails(id);
+            setLivePrice(response.data.market_data.current_price.usd);
+         } catch (err) {
+            console.error('Error fetching live price:', err);
+         }
+      }, 5000); // Update every 5 seconds
+
+      // Clean up interval on component unmount
+      return () => clearInterval(livePriceInterval);
    }, [id]);
 
    useEffect(() => {
@@ -101,8 +116,8 @@ const CryptoDetailPage = () => {
       return new Intl.NumberFormat('en-US', {
          style: 'currency',
          currency: 'USD',
-         minimumFractionDigits: 0,
-         maximumFractionDigits: 0
+         minimumFractionDigits: 2,
+         maximumFractionDigits: 2
       }).format(price);
    };
 
@@ -143,6 +158,9 @@ const CryptoDetailPage = () => {
                      transition={{ duration: 0.5 }}
                   >
                      <h2>{crypto.name} Price Chart</h2>
+                     <div className="live-price">
+                        Current Price: {formatPrice(livePrice)}
+                     </div>
                      <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={historicalData}>
                            <XAxis 
@@ -179,7 +197,7 @@ const CryptoDetailPage = () => {
                      <div className="grid grid-cols-2 gap-4">
                         <div>
                            <p className="text-sm text-gray-500">Current Price</p>
-                           <p className="text-lg font-bold">{formatPrice(crypto.market_data.current_price.usd)}</p>
+                           <p className="text-lg font-bold">{formatPrice(livePrice)}</p>
                         </div>
                         <div>
                            <p className="text-sm text-gray-500">24h Change</p>
