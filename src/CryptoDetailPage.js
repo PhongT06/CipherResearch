@@ -87,7 +87,9 @@ const CryptoDetailPage = () => {
             transition={{ duration: 0.5 }}
          >
             <img src={crypto.image.large} alt={crypto.name} className="crypto-logo" />
-            <h1 className="crypto-name">{crypto.name} ({crypto.symbol.toUpperCase()})</h1>
+            <h1 className="crypto-name">
+               {crypto.name} <span className="crypto-symbol">({crypto.symbol.toUpperCase()})</span>
+            </h1>
          </motion.header>
 
          <div className="content-container">
