@@ -77,7 +77,7 @@ const CryptoDetailPage = () => {
 
    useEffect(() => {
       if (videoRef.current) {
-         videoRef.current.playbackRate = 0.55; // Adjust this value to change the playback speed
+         videoRef.current.playbackRate = 0.85; // Adjust this value to change the playback speed
       }
    }, []);
 

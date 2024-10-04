@@ -16,6 +16,15 @@ const Navbar = () => {
       return () => window.removeEventListener('scroll', handleScroll);
    }, []);
 
+   const navItems = [
+      { name: 'Home', path: '/' },
+      { name: 'Research', path: '/research' },
+      { name: 'Community', path: '/community' },
+      { name: 'Tools', path: '/tools' },
+      { name: 'Using Web3', path: '/using-web3' },
+      { name: 'Glossary', path: '/glossary' }
+   ];
+
    return (
       <header className={`sticky-nav-container ${isSticky ? 'is-sticky' : ''}`}>
          <nav className="bg-gray-900 text-white p-4">
@@ -27,18 +36,18 @@ const Navbar = () => {
                   </span>
                </Link>
                <ul className="nav-links">
-                  {['Home', 'Research', 'Community', 'Tools', 'Using Web3', 'Glossary'].map((item) => (
+                  {navItems.map((item) => (
                      <motion.li 
-                        key={item} 
+                        key={item.name} 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                      >
                         <Link 
-                           to={`/${item.toLowerCase().replace(' ', '-')}`} 
+                           to={item.path} 
                            className="relative group"
                         >
                            <span className="relative z-10 transition-colors duration-300 group-hover:text-yellow-400">
-                              {item}
+                              {item.name}
                            </span>
                            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-blue-400 transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100"></span>
                         </Link>
@@ -53,14 +62,14 @@ const Navbar = () => {
             </div>
             {isMobileMenuOpen && (
                <div className="mobile-menu">
-                  {['Home', 'Research', 'Community', 'Tools', 'Using Web3', 'Glossary'].map((item) => (
+                  {navItems.map((item) => (
                      <Link 
-                        key={item}
-                        to={`/${item.toLowerCase().replace(' ', '-')}`} 
+                        key={item.name}
+                        to={item.path} 
                         className="block py-2 px-4 text-sm hover:bg-gray-800"
                         onClick={() => setIsMobileMenuOpen(false)}
                      >
-                        {item}
+                        {item.name}
                      </Link>
                   ))}
                </div>
