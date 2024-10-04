@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
@@ -6,7 +6,7 @@ import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { getCryptoDetails, getCryptoHistoricalData } from './api';
 import { getContentfulData } from './contentful';
 import './CryptoDetailPage.css';
-import PriceStatsPopup from './PriceStatsPopup'; // We'll create this component
+import PriceStatsPopup from './PriceStatsPopup';
 
 const renderOptions = {
    renderNode: {
@@ -40,39 +40,46 @@ const CryptoDetailPage = () => {
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
    const [showPopup, setShowPopup] = useState(false);
+   const videoRef = useRef(null);
 
    useEffect(() => {
       const fetchData = async () => {
          try {
-            const [apiResponse, contentfulResponse, historicalResponse] = await Promise.all([
-               getCryptoDetails(id),
-               getContentfulData(id),
-               getCryptoHistoricalData(id)
-            ]);
-            
-            setCrypto(apiResponse.data);
-            setContentfulData(contentfulResponse);
-            
-            if (historicalResponse && historicalResponse.prices) {
-               setHistoricalData(historicalResponse.prices.map(([timestamp, price]) => ({
-                  date: new Date(timestamp),
-                  price: price
-               })).filter(item => !isNaN(item.date.getTime())));
-            } else {
-               console.error('Invalid historical data structure:', historicalResponse);
-               setError('Failed to process historical data. Please try again later.');
-            }
-            
-            setLoading(false);
+         const [apiResponse, contentfulResponse, historicalResponse] = await Promise.all([
+            getCryptoDetails(id),
+            getContentfulData(id),
+            getCryptoHistoricalData(id)
+         ]);
+         
+         setCrypto(apiResponse.data);
+         setContentfulData(contentfulResponse);
+         
+         if (historicalResponse && historicalResponse.prices) {
+            setHistoricalData(historicalResponse.prices.map(([timestamp, price]) => ({
+               date: new Date(timestamp),
+               price: price
+            })).filter(item => !isNaN(item.date.getTime())));
+         } else {
+            console.error('Invalid historical data structure:', historicalResponse);
+            setError('Failed to process historical data. Please try again later.');
+         }
+         
+         setLoading(false);
          } catch (err) {
-            console.error('Error fetching data:', err);
-            setError(`Failed to fetch cryptocurrency details. ${err.response ? err.response.data.error : err.message}`);
-            setLoading(false);
+         console.error('Error fetching data:', err);
+         setError(`Failed to fetch cryptocurrency details. ${err.response ? err.response.data.error : err.message}`);
+         setLoading(false);
          }
       };
 
       fetchData();
    }, [id]);
+
+   useEffect(() => {
+      if (videoRef.current) {
+         videoRef.current.playbackRate = 0.55; // Adjust this value to change the playback speed
+      }
+   }, []);
 
    if (loading) return <div className="loading">Loading...</div>;
    if (error) return <div className="error">{error}</div>;
@@ -80,6 +87,17 @@ const CryptoDetailPage = () => {
 
    return (
       <div className="crypto-detail-page">
+         <video
+         ref={videoRef}
+         className="background-video"
+         autoPlay
+         muted
+         playsInline
+         >
+         <source src={`${process.env.PUBLIC_URL}/Crypto.mp4`} type="video/mp4" />
+         Your browser does not support the video tag.
+         </video>
+         <div className="content-wrapper">
          <motion.header
             className="crypto-header"
             initial={{ opacity: 0, y: -50 }}
@@ -99,25 +117,25 @@ const CryptoDetailPage = () => {
             </button>
             {contentfulData && (
                <>
-                  <InfoSection title="Educational Content" content={contentfulData.educationalContent || 'Coming soon...'} />
-                  <InfoSection title={`Using ${crypto.name}`} content={contentfulData.using || 'Coming soon...'} />
-                  <InfoSection title={`Staking ${crypto.name}`} content={contentfulData.staking || 'Coming soon...'} />
+               <InfoSection title="Educational Content" content={contentfulData.educationalContent || 'Coming soon...'} />
+               <InfoSection title={`Using ${crypto.name}`} content={contentfulData.using || 'Coming soon...'} />
+               <InfoSection title={`Staking ${crypto.name}`} content={contentfulData.staking || 'Coming soon...'} />
                </>
             )}
             {contentfulData && contentfulData.videoLinks && contentfulData.videoLinks.length > 0 && (
                <InfoSection
-                  title="Helpful Videos"
-                  content={
-                     <ul>
-                        {contentfulData.videoLinks.map((link, index) => (
-                           <li key={index}>
-                              <a href={link.url} target="_blank" rel="noopener noreferrer">
-                                 {link.title}
-                              </a>
-                           </li>
-                        ))}
-                     </ul>
-                  }
+               title="Helpful Videos"
+               content={
+                  <ul>
+                     {contentfulData.videoLinks.map((link, index) => (
+                     <li key={index}>
+                        <a href={link.url} target="_blank" rel="noopener noreferrer">
+                           {link.title}
+                        </a>
+                     </li>
+                     ))}
+                  </ul>
+               }
                />
             )}
             <motion.div 
@@ -129,36 +147,37 @@ const CryptoDetailPage = () => {
             >
                <h2>Links</h2>
                <div className="grid grid-cols-2 gap-4">
-                  {crypto.links.homepage[0] && (
-                     <a href={crypto.links.homepage[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                        Official Website
-                     </a>
-                  )}
-                  {crypto.links.blockchain_site[0] && (
-                     <a href={crypto.links.blockchain_site[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                        Blockchain Explorer
-                     </a>
-                  )}
-                  {crypto.links.official_forum_url[0] && (
-                     <a href={crypto.links.official_forum_url[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                        Official Forum
-                     </a>
-                  )}
-                  {crypto.links.subreddit_url && (
-                     <a href={crypto.links.subreddit_url} target="_blank" rel="noopener noreferrer" className="link-button">
-                        Reddit
-                     </a>
-                  )}
+               {crypto.links.homepage[0] && (
+                  <a href={crypto.links.homepage[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                     Official Website
+                  </a>
+               )}
+               {crypto.links.blockchain_site[0] && (
+                  <a href={crypto.links.blockchain_site[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                     Blockchain Explorer
+                  </a>
+               )}
+               {crypto.links.official_forum_url[0] && (
+                  <a href={crypto.links.official_forum_url[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                     Official Forum
+                  </a>
+               )}
+               {crypto.links.subreddit_url && (
+                  <a href={crypto.links.subreddit_url} target="_blank" rel="noopener noreferrer" className="link-button">
+                     Reddit
+                  </a>
+               )}
                </div>
             </motion.div>
          </div>
+         </div>
          
          {showPopup && (
-            <PriceStatsPopup
-               crypto={crypto}
-               historicalData={historicalData}
-               onClose={() => setShowPopup(false)}
-            />
+         <PriceStatsPopup
+            crypto={crypto}
+            historicalData={historicalData}
+            onClose={() => setShowPopup(false)}
+         />
          )}
       </div>
    );

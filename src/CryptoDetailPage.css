@@ -1,10 +1,29 @@
 .crypto-detail-page {
+   position: relative;
+   min-height: 100vh;
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   color: #fff;
+   overflow: hidden;
+}
+
+.background-video {
+   position: fixed;
+   right: 0;
+   bottom: 0;
+   min-width: 100%;
+   min-height: 100%;
+   width: auto;
+   height: auto;
+   z-index: -1;
+   object-fit: cover;
+}
+
+.content-wrapper {
    max-width: 800px;
    margin: 0 auto;
    padding: 2rem;
-   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-   background-color: #f0f2f5;
-   color: #333;
+   position: relative;
+   z-index: 1;
 }
 
 .crypto-header {
@@ -13,6 +32,9 @@
    align-items: center;
    margin-bottom: 2rem;
    text-align: center;
+   background-color: rgba(0, 0, 0, 0.7);
+   padding: 1rem;
+   border-radius: 10px;
 }
 
 .crypto-logo {
@@ -24,20 +46,17 @@
 .crypto-name {
    font-size: 3rem;
    font-weight: 800;
-   color: #2c3e50;
+   color: #fff;
    text-transform: uppercase;
    letter-spacing: 2px;
    margin: 0;
-   background: linear-gradient(45deg, #3498db, #2ecc71);
-   -webkit-background-clip: text;
-   -webkit-text-fill-color: transparent;
-   text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .crypto-symbol {
    font-size: 1.5rem;
    font-weight: 600;
-   color: #7f8c8d;
+   color: #a0a0a0;
    margin-left: 0.5rem;
 }
 
@@ -48,16 +67,38 @@
 }
 
 .info-section, .links-card {
-   background-color: #fff;
+   background-color: rgba(0, 0, 0, 0.7);
    border-radius: 10px;
    padding: 1.5rem;
-   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
    transition: transform 0.3s ease, box-shadow 0.3s ease;
+   position: relative;
+   overflow: hidden;
+}
+
+.info-section::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: -100%;
+   width: 100%;
+   height: 2px;
+   background: linear-gradient(90deg, transparent, #3498db, transparent);
+   animation: pulse 8s infinite;
+}
+
+@keyframes pulse {
+   0% {
+      left: -100%;
+   }
+   50%, 100% {
+      left: 100%;
+   }
 }
 
 .info-section:hover, .links-card:hover {
    transform: translateY(-5px);
-   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 h2 {
@@ -110,14 +151,14 @@ h2 {
    background-color: #2980b9;
 }
 
-/* Popup styles */
+ /* Popup styles */
 .popup-overlay {
    position: fixed;
    top: 0;
    left: 0;
    right: 0;
    bottom: 0;
-   background-color: rgba(0, 0, 0, 0.5);
+   background-color: rgba(0, 0, 0, 0.8);
    display: flex;
    justify-content: center;
    align-items: center;
@@ -125,7 +166,7 @@ h2 {
 }
 
 .popup-content {
-   background-color: white;
+   background-color: rgba(0, 0, 0, 0.9);
    padding: 2rem;
    border-radius: 10px;
    width: 90%;
@@ -133,6 +174,7 @@ h2 {
    max-height: 90%;
    overflow-y: auto;
    position: relative;
+   color: #fff;
 }
 
 .close-button {
@@ -143,22 +185,23 @@ h2 {
    background: none;
    border: none;
    cursor: pointer;
+   color: #fff;
 }
 
 .live-price {
    font-size: 1.2rem;
    font-weight: bold;
-   color: #2c3e50;
+   color: #fff;
    margin-bottom: 1rem;
    padding: 0.5rem;
-   background-color: #f8f9fa;
+   background-color: rgba(248, 249, 250, 0.1);
    border-radius: 5px;
    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
    transition: background-color 0.3s ease;
 }
 
 .live-price:hover {
-   background-color: #e9ecef;
+   background-color: rgba(233, 236, 239, 0.2);
 }
 
 .price-chart {
@@ -181,7 +224,7 @@ h2 {
 
 .key-stats .text-sm {
    font-size: 0.875rem;
-   color: #6c757d;
+   color: #a0a0a0;
 }
 
 .key-stats .text-lg {
@@ -197,9 +240,9 @@ h2 {
    color: #EF4444;
 }
 
-/* Responsive design */
+ /* Responsive design */
 @media (max-width: 768px) {
-   .crypto-detail-page {
+   .content-wrapper {
       padding: 1rem;
    }
 
@@ -216,13 +259,13 @@ h2 {
       padding: 1rem;
       max-width: 95%;
    }
+
+   .price-chart {
+      height: 300px;
+   }
 }
 
-.price-chart {
-   height: 300px;
-}
-
-/* Animations */
+ /* Animations */
 @keyframes fadeIn {
    from { opacity: 0; }
    to { opacity: 1; }
@@ -232,27 +275,36 @@ h2 {
    animation: fadeIn 0.5s ease-out;
 }
 
-/* Accessibility */
-.view-price-stats-btn:focus,
-.link-button:focus,
-.close-button:focus {
+ /* Accessibility */
+   .view-price-stats-btn:focus,
+   .link-button:focus,
+   .close-button:focus {
    outline: 2px solid #3498db;
    outline-offset: 2px;
 }
 
-/* Print styles */
+ /* Print styles */
 @media print {
    .view-price-stats-btn,
-   .popup-overlay {
+   .popup-overlay,
+   .background-video {
       display: none;
    }
 
-   .crypto-detail-page {
+   .content-wrapper {
       background-color: white;
+      color: black;
    }
 
    .info-section, .links-card {
       box-shadow: none;
       border: 1px solid #ddd;
+      background-color: white;
+      color: black;
+   }
+
+   .crypto-name {
+      color: black;
+      text-shadow: none;
    }
 }
