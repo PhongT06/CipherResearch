@@ -34,12 +34,25 @@ const PriceStatsPopup = ({ crypto, historicalData, onClose }) => {
       }
       return new Intl.DateTimeFormat('en-US', {
          month: 'short',
-         day: 'numeric'
+         day: 'numeric',
+         hour: '2-digit',
+         minute: '2-digit'
       }).format(date);
    };
 
    const formatPercentage = (percentage) => {
       return percentage.toFixed(2) + '%';
+   };
+
+   const formatTooltip = (value, name, props) => {
+      if (name === 'price') {
+         const date = new Date(props.payload.date);
+         return [
+            formatPrice(value),
+            formatDate(date)
+         ];
+      }
+      return [value, name];
    };
 
    return (
@@ -64,31 +77,31 @@ const PriceStatsPopup = ({ crypto, historicalData, onClose }) => {
             </div>
             <div className="price-chart">
                <ResponsiveContainer width="100%" height="100%">
-                     <LineChart data={historicalData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                        <XAxis 
-                           dataKey="date" 
-                           tickFormatter={formatDate}
-                           domain={['auto', 'auto']}
-                        />
-                        <YAxis 
-                           domain={['auto', 'auto']}
-                           tickFormatter={formatPrice}
-                           width={80} 
-                        />
-                        <Tooltip 
-                           formatter={(value) => [formatPrice(value), 'Price']}
-                           labelFormatter={(label) => `Date: ${formatDate(new Date(label))}`}
-                        />
-                        <Line 
-                           type="monotone" 
-                           dataKey="price" 
-                           stroke="#8884d8" 
-                           dot={false}
-                           strokeWidth={2}
-                        />
-                     </LineChart>
-                  </ResponsiveContainer>
-               </div>
+                  <LineChart data={historicalData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                     <XAxis 
+                        dataKey="date" 
+                        tickFormatter={(tick) => formatDate(new Date(tick))}
+                        domain={['auto', 'auto']}
+                     />
+                     <YAxis 
+                        domain={['auto', 'auto']}
+                        tickFormatter={formatPrice}
+                        width={80} 
+                     />
+                     <Tooltip 
+                        formatter={formatTooltip}
+                        labelFormatter={(label) => `Date: ${formatDate(new Date(label))}`}
+                     />
+                     <Line 
+                        type="monotone" 
+                        dataKey="price" 
+                        stroke="#8884d8" 
+                        dot={false}
+                        strokeWidth={2}
+                     />
+                  </LineChart>
+               </ResponsiveContainer>
+            </div>
             <div className="key-stats">
                <h3>Key Stats</h3>
                <div className="grid grid-cols-2 gap-4">
