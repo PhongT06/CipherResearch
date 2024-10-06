@@ -10,11 +10,11 @@ const PriceStatsPopup = ({ crypto, historicalData, onClose }) => {
       const livePriceInterval = setInterval(async () => {
          try {
             const response = await getCryptoDetails(crypto.id);
-            setLivePrice(response.data.market_data.current_price.usd);
+            setLivePrice(response.market_data.current_price.usd);
          } catch (err) {
             console.error('Error fetching live price:', err);
          }
-      }, 5000);
+      }, 60000);  // Update every 60 seconds to respect API rate limits
 
       return () => clearInterval(livePriceInterval);
    }, [crypto.id]);

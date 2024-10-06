@@ -97,9 +97,9 @@ const HomePage = () => {
 
    const fetchData = useCallback(async () => {
       try {
-         const response = await getTopCryptos();
+         const data = await getTopCryptos();
          setCryptos(prevCryptos => {
-            return response.data.map(newCrypto => {
+            return data.map(newCrypto => {
                const oldCrypto = prevCryptos.find(c => c.id === newCrypto.id);
                return {
                   ...newCrypto,
@@ -117,7 +117,7 @@ const HomePage = () => {
 
    useEffect(() => {
       fetchData();
-      const intervalId = setInterval(fetchData, 5000); // Update every 5 seconds
+      const intervalId = setInterval(fetchData, 60000); // Update every 60 seconds to respect API rate limits
 
       return () => clearInterval(intervalId);
    }, [fetchData]);

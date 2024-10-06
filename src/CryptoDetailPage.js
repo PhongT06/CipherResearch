@@ -45,30 +45,30 @@ const CryptoDetailPage = () => {
    useEffect(() => {
       const fetchData = async () => {
          try {
-         const [apiResponse, contentfulResponse, historicalResponse] = await Promise.all([
-            getCryptoDetails(id),
-            getContentfulData(id),
-            getCryptoHistoricalData(id)
-         ]);
-         
-         setCrypto(apiResponse.data);
-         setContentfulData(contentfulResponse);
-         
-         if (historicalResponse && historicalResponse.prices) {
-            setHistoricalData(historicalResponse.prices.map(([timestamp, price]) => ({
-               date: new Date(timestamp),
-               price: price
-            })).filter(item => !isNaN(item.date.getTime())));
-         } else {
-            console.error('Invalid historical data structure:', historicalResponse);
-            setError('Failed to process historical data. Please try again later.');
-         }
-         
-         setLoading(false);
+            const [apiResponse, contentfulResponse, historicalResponse] = await Promise.all([
+               getCryptoDetails(id),
+               getContentfulData(id),
+               getCryptoHistoricalData(id)
+            ]);
+            
+            setCrypto(apiResponse);  // Note: removed .data as per new API structure
+            setContentfulData(contentfulResponse);
+            
+            if (historicalResponse && historicalResponse.prices) {
+               setHistoricalData(historicalResponse.prices.map(([timestamp, price]) => ({
+                  date: new Date(timestamp),
+                  price: price
+               })).filter(item => !isNaN(item.date.getTime())));
+            } else {
+               console.error('Invalid historical data structure:', historicalResponse);
+               setError('Failed to process historical data. Please try again later.');
+            }
+            
+            setLoading(false);
          } catch (err) {
-         console.error('Error fetching data:', err);
-         setError(`Failed to fetch cryptocurrency details. ${err.response ? err.response.data.error : err.message}`);
-         setLoading(false);
+            console.error('Error fetching data:', err);
+            setError(`Failed to fetch cryptocurrency details. ${err.message}`);
+            setLoading(false);
          }
       };
 
@@ -77,7 +77,7 @@ const CryptoDetailPage = () => {
 
    useEffect(() => {
       if (videoRef.current) {
-         videoRef.current.playbackRate = 0.85; // Adjust this value to change the playback speed
+         videoRef.current.playbackRate = 0.85;
       }
    }, []);
 
