@@ -6,7 +6,7 @@
    overflow: hidden;
 }
 
-.background-video {
+.background-image {
    position: fixed;
    right: 0;
    bottom: 0;
@@ -15,7 +15,10 @@
    width: auto;
    height: auto;
    z-index: -1;
-   object-fit: cover;
+   background-image: url('/public/Crypto.png');
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
 }
 
 .content-wrapper {

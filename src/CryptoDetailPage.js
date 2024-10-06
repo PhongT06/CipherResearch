@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
@@ -40,7 +40,6 @@ const CryptoDetailPage = () => {
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
    const [showPopup, setShowPopup] = useState(false);
-   const videoRef = useRef(null);
 
    useEffect(() => {
       const fetchData = async () => {
@@ -51,7 +50,7 @@ const CryptoDetailPage = () => {
                getCryptoHistoricalData(id)
             ]);
             
-            setCrypto(apiResponse);  // Note: removed .data as per new API structure
+            setCrypto(apiResponse);
             setContentfulData(contentfulResponse);
             
             if (historicalResponse && historicalResponse.prices) {
@@ -75,28 +74,13 @@ const CryptoDetailPage = () => {
       fetchData();
    }, [id]);
 
-   useEffect(() => {
-      if (videoRef.current) {
-         videoRef.current.playbackRate = 0.85;
-      }
-   }, []);
-
    if (loading) return <div className="loading">Loading...</div>;
    if (error) return <div className="error">{error}</div>;
    if (!crypto) return <div className="no-data">No data available.</div>;
 
    return (
       <div className="crypto-detail-page">
-         <video
-         ref={videoRef}
-         className="background-video"
-         autoPlay
-         muted
-         playsInline
-         >
-         <source src={`${process.env.PUBLIC_URL}/Crypto.mp4`} type="video/mp4" />
-         Your browser does not support the video tag.
-         </video>
+         <div className="background-image"></div>
          <div className="content-wrapper">
          <motion.header
             className="crypto-header"
