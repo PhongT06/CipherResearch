@@ -7,6 +7,7 @@ import { getCryptoDetails, getCryptoHistoricalData } from './api';
 import { getContentfulData } from './contentful';
 import './CryptoDetailPage.css';
 import PriceStatsPopup from './PriceStatsPopup';
+import PriceStatsCard from './PriceStatsCard';
 
 const renderOptions = {
    renderNode: {
@@ -15,7 +16,7 @@ const renderOptions = {
    },
 };
 
-const InfoSection = ({ title, content }) => (
+const InfoSection = ({ title, content, children }) => (
    <motion.div 
       className="info-section"
       initial={{ opacity: 0, y: 50 }}
@@ -24,6 +25,7 @@ const InfoSection = ({ title, content }) => (
       transition={{ duration: 0.5 }}
    >
       <h2>{title}</h2>
+      {children}
       <div className="content">
          {typeof content === 'string'
          ? <div dangerouslySetInnerHTML={{ __html: content }} />
@@ -40,6 +42,23 @@ const CryptoDetailPage = () => {
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
    const [showPopup, setShowPopup] = useState(false);
+   const [screenSize, setScreenSize] = useState(getScreenSize());
+
+   function getScreenSize() {
+      const width = window.innerWidth;
+      if (width >= 1080) return 'large';
+      if (width >= 768) return 'medium';
+      return 'small';
+   }
+
+   useEffect(() => {
+      const handleResize = () => {
+         setScreenSize(getScreenSize());
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+   }, []);
 
    useEffect(() => {
       const fetchData = async () => {
@@ -79,84 +98,97 @@ const CryptoDetailPage = () => {
    if (!crypto) return <div className="no-data">No data available.</div>;
 
    return (
-      <div className="crypto-detail-page">
+      <div className={`crypto-detail-page ${screenSize}`}>
          <div className="background-image"></div>
          <div className="content-wrapper">
-         <motion.header
-            className="crypto-header"
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-         >
-            <img src={crypto.image.large} alt={crypto.name} className="crypto-logo" />
-            <h1 className="crypto-name">
-               {crypto.name} <span className="crypto-symbol">({crypto.symbol.toUpperCase()})</span>
-            </h1>
-         </motion.header>
-
-         <div className="content-container">
-            <InfoSection title="About" content={crypto.description.en} />
-            <button onClick={() => setShowPopup(true)} className="view-price-stats-btn">
-               View Price Charts and Key Stats
-            </button>
-            {contentfulData && (
-               <>
-               <InfoSection title="Educational Content" content={contentfulData.educationalContent || 'Coming soon...'} />
-               <InfoSection title={`Using ${crypto.name}`} content={contentfulData.using || 'Coming soon...'} />
-               <InfoSection title={`Staking ${crypto.name}`} content={contentfulData.staking || 'Coming soon...'} />
-               </>
-            )}
-            {contentfulData && contentfulData.videoLinks && contentfulData.videoLinks.length > 0 && (
-               <InfoSection
-               title="Helpful Videos"
-               content={
-                  <ul>
-                     {contentfulData.videoLinks.map((link, index) => (
-                     <li key={index}>
-                        <a href={link.url} target="_blank" rel="noopener noreferrer">
-                           {link.title}
-                        </a>
-                     </li>
-                     ))}
-                  </ul>
-               }
-               />
-            )}
-            <motion.div 
-               className="links-card mt-4"
-               initial={{ opacity: 0, y: 50 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
+            <motion.header
+               className="crypto-header"
+               initial={{ opacity: 0, y: -50 }}
+               animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.5 }}
             >
-               <h2>Links</h2>
-               <div className="grid grid-cols-2 gap-4">
-               {crypto.links.homepage[0] && (
-                  <a href={crypto.links.homepage[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                     Official Website
-                  </a>
+               <img src={crypto.image.large} alt={crypto.name} className="crypto-logo" />
+               <h1 className="crypto-name">
+                  {crypto.name} <span className="crypto-symbol">({crypto.symbol.toUpperCase()})</span>
+               </h1>
+            </motion.header>
+
+            <div className="content-container">
+               {screenSize !== 'small' && (
+                  <div className="price-stats-card-container">
+                     <PriceStatsCard
+                        crypto={crypto}
+                        historicalData={historicalData}
+                     />
+                  </div>
                )}
-               {crypto.links.blockchain_site[0] && (
-                  <a href={crypto.links.blockchain_site[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                     Blockchain Explorer
-                  </a>
-               )}
-               {crypto.links.official_forum_url[0] && (
-                  <a href={crypto.links.official_forum_url[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                     Official Forum
-                  </a>
-               )}
-               {crypto.links.subreddit_url && (
-                  <a href={crypto.links.subreddit_url} target="_blank" rel="noopener noreferrer" className="link-button">
-                     Reddit
-                  </a>
-               )}
+               <div className="info-sections-container">
+                  <InfoSection title="About" content={crypto.description.en}>
+                     {screenSize === 'small' && (
+                        <button onClick={() => setShowPopup(true)} className="view-price-stats-btn">
+                           View Price Charts and Key Stats
+                        </button>
+                     )}
+                  </InfoSection>
+                  {contentfulData && (
+                     <>
+                     <InfoSection title="Educational Content" content={contentfulData.educationalContent || 'Coming soon...'} />
+                     <InfoSection title={`Using ${crypto.name}`} content={contentfulData.using || 'Coming soon...'} />
+                     <InfoSection title={`Staking ${crypto.name}`} content={contentfulData.staking || 'Coming soon...'} />
+                     </>
+                  )}
+                  {contentfulData && contentfulData.videoLinks && contentfulData.videoLinks.length > 0 && (
+                     <InfoSection
+                     title="Helpful Videos"
+                     content={
+                        <ul>
+                           {contentfulData.videoLinks.map((link, index) => (
+                           <li key={index}>
+                              <a href={link.url} target="_blank" rel="noopener noreferrer">
+                                 {link.title}
+                              </a>
+                           </li>
+                           ))}
+                        </ul>
+                     }
+                     />
+                  )}
+                  <motion.div 
+                     className="links-card mt-4"
+                     initial={{ opacity: 0, y: 50 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     viewport={{ once: true }}
+                     transition={{ duration: 0.5 }}
+                  >
+                     <h2>Links</h2>
+                     <div className="grid grid-cols-2 gap-4">
+                     {crypto.links.homepage[0] && (
+                        <a href={crypto.links.homepage[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                           Official Website
+                        </a>
+                     )}
+                     {crypto.links.blockchain_site[0] && (
+                        <a href={crypto.links.blockchain_site[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                           Blockchain Explorer
+                        </a>
+                     )}
+                     {crypto.links.official_forum_url[0] && (
+                        <a href={crypto.links.official_forum_url[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                           Official Forum
+                        </a>
+                     )}
+                     {crypto.links.subreddit_url && (
+                        <a href={crypto.links.subreddit_url} target="_blank" rel="noopener noreferrer" className="link-button">
+                           Reddit
+                        </a>
+                     )}
+                     </div>
+                  </motion.div>
                </div>
-            </motion.div>
-         </div>
+            </div>
          </div>
          
-         {showPopup && (
+         {screenSize === 'small' && showPopup && (
          <PriceStatsPopup
             crypto={crypto}
             historicalData={historicalData}

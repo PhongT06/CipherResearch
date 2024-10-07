@@ -33,10 +33,8 @@ const PriceStatsPopup = ({ crypto, historicalData, onClose }) => {
          return '';
       }
       return new Intl.DateTimeFormat('en-US', {
-         month: 'short',
-         day: 'numeric',
-         hour: '2-digit',
-         minute: '2-digit'
+         month: '2-digit',
+         day: '2-digit'
       }).format(date);
    };
 
@@ -76,12 +74,15 @@ const PriceStatsPopup = ({ crypto, historicalData, onClose }) => {
                Current Price: {formatPrice(livePrice)}
             </div>
             <div className="price-chart">
-               <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={historicalData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+               <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={historicalData} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
                      <XAxis 
                         dataKey="date" 
                         tickFormatter={(tick) => formatDate(new Date(tick))}
                         domain={['auto', 'auto']}
+                        angle={-45}
+                        textAnchor="end"
+                        height={70}
                      />
                      <YAxis 
                         domain={['auto', 'auto']}
