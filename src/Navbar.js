@@ -34,7 +34,7 @@ const Navbar = () => {
                         whileTap={{ scale: 0.95 }}
                      >
                         <Link 
-                           to={`/${item.toLowerCase().replace(' ', '-')}`} 
+                           to={item === 'Home' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`}
                            className="relative group"
                         >
                            <span className="relative z-10 transition-colors duration-300 group-hover:text-yellow-400">
@@ -56,7 +56,7 @@ const Navbar = () => {
                   {['Home', 'Research', 'Community', 'Tools', 'Using Web3', 'Glossary'].map((item) => (
                      <Link 
                         key={item}
-                        to={`/${item.toLowerCase().replace(' ', '-')}`} 
+                        to={item === 'Home' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`}
                         className="block py-2 px-4 text-sm hover:bg-gray-800"
                         onClick={() => setIsMobileMenuOpen(false)}
                      >

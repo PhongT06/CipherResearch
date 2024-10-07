@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { getCryptoDetails } from './api';
+import CustomTooltip from './CustomTooltip';
 
 const PriceStatsPopup = ({ crypto, historicalData, onClose }) => {
    const [livePrice, setLivePrice] = useState(crypto.market_data.current_price.usd);
@@ -89,10 +90,7 @@ const PriceStatsPopup = ({ crypto, historicalData, onClose }) => {
                         tickFormatter={formatPrice}
                         width={80} 
                      />
-                     <Tooltip 
-                        formatter={formatTooltip}
-                        labelFormatter={(label) => `Date: ${formatDate(new Date(label))}`}
-                     />
+                     <Tooltip content={<CustomTooltip />} />
                      <Line 
                         type="monotone" 
                         dataKey="price" 

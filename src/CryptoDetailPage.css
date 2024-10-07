@@ -161,9 +161,20 @@ h2 {
    background-color: #2980b9;
 }
 
+.price-stats-card-container {
+   position: sticky;
+   top: 2rem;
+   align-self: flex-start;
+}
+
 .price-stats-card {
-   max-height: 80vh;
-   overflow-y: auto;
+   background-color: rgba(0, 0, 0, 0.7);
+   border-radius: 10px;
+   padding: 1.5rem;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+   transition: transform 0.3s ease, box-shadow 0.3s ease;
+   position: relative;
+   margin-bottom: 1rem;
 }
 
 .live-price {
@@ -419,4 +430,52 @@ h2 {
    .stat-value {
       font-size: 1rem;
    }
+}
+
+/* Custom Tooltip Styles */
+.recharts-tooltip-wrapper {
+   pointer-events: none;
+}
+
+.custom-tooltip {
+   background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(28,45,65,0.9) 100%);
+   border: 1px solid #3498db;
+   border-radius: 4px;
+   padding: 10px;
+   box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+   position: relative;
+   z-index: 1000;
+}
+
+.custom-tooltip::before {
+   content: '';
+   position: absolute;
+   top: -5px;
+   left: 50%;
+   margin-left: -5px;
+   border-width: 0 5px 5px;
+   border-style: solid;
+   border-color: transparent transparent #3498db transparent;
+}
+
+.custom-tooltip-label {
+   color: #3498db;
+   font-weight: bold;
+   margin-bottom: 5px;
+   font-size: 0.9rem;
+}
+
+.custom-tooltip-data {
+   color: #fff;
+   font-size: 0.8rem;
+}
+
+.custom-tooltip-data span {
+   display: block;
+   margin-bottom: 3px;
+}
+
+.custom-tooltip-price {
+   color: #2ecc71;
+   font-weight: bold;
 }
