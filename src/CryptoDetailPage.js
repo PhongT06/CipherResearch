@@ -9,6 +9,24 @@ import './CryptoDetailPage.css';
 import PriceStatsPopup from './PriceStatsPopup';
 import PriceStatsCard from './PriceStatsCard';
 
+const formatPrice = (price) => {
+  if (price >= 1000) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
+  } else {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+  }
+};
+
 const renderOptions = {
    renderNode: {
       [BLOCKS.PARAGRAPH]: (node, children) => <p>{children}</p>,
@@ -119,6 +137,7 @@ const CryptoDetailPage = () => {
                      <PriceStatsCard
                         crypto={crypto}
                         historicalData={historicalData}
+                        formatPrice={formatPrice}
                      />
                   ) : (
                      <button onClick={() => setShowPopup(true)} className="view-price-stats-btn">
@@ -191,6 +210,7 @@ const CryptoDetailPage = () => {
             crypto={crypto}
             historicalData={historicalData}
             onClose={() => setShowPopup(false)}
+            formatPrice={formatPrice}
          />
          )}
       </div>

@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { getCryptoDetails } from './api';
 import CustomTooltip from './CustomTooltip';
 
-const PriceStatsCard = ({ crypto, historicalData }) => {
+const PriceStatsCard = ({ crypto, historicalData, formatPrice }) => {
    const [livePrice, setLivePrice] = useState(crypto.market_data.current_price.usd);
 
    useEffect(() => {
@@ -19,15 +19,6 @@ const PriceStatsCard = ({ crypto, historicalData }) => {
       return () => clearInterval(livePriceInterval);
    }, [crypto.id]);
 
-   const formatPrice = (price) => {
-      return new Intl.NumberFormat('en-US', {
-         style: 'currency',
-         currency: 'USD',
-         minimumFractionDigits: 2,
-         maximumFractionDigits: 2
-      }).format(price);
-   };
-
    const formatDate = (date) => {
       if (!(date instanceof Date) || isNaN(date.getTime())) {
          return '';
@@ -40,17 +31,6 @@ const PriceStatsCard = ({ crypto, historicalData }) => {
 
    const formatPercentage = (percentage) => {
       return percentage.toFixed(2) + '%';
-   };
-
-   const formatTooltip = (value, name, props) => {
-      if (name === 'price') {
-         const date = new Date(props.payload.date);
-         return [
-            formatPrice(value),
-            formatDate(date)
-         ];
-      }
-      return [value, name];
    };
 
    return (
@@ -75,7 +55,7 @@ const PriceStatsCard = ({ crypto, historicalData }) => {
                   tickFormatter={formatPrice}
                   width={80} 
                />
-               <Tooltip content={<CustomTooltip />} />
+               <Tooltip content={<CustomTooltip formatPrice={formatPrice} />} />
                <Line 
                   type="monotone" 
                   dataKey="price" 
