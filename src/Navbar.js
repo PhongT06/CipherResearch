@@ -22,7 +22,7 @@ const Navbar = () => {
             <div className="nav-content">
                <Link to="/" className="logo-container">
                   <img src="/cipher_research_logo003.png" alt="Cipher Research Logo" className="w-20 h-20 mr-2" />
-                  <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-yellow-300 brightness-150">
+                  <span className="logo-text">
                      Cipher Research
                   </span>
                </Link>

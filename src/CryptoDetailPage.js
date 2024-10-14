@@ -114,22 +114,20 @@ const CryptoDetailPage = () => {
             </motion.header>
 
             <div className="content-container">
-               {screenSize !== 'small' && (
-                  <div className="price-stats-card-container">
+               <div className="price-stats-card-container">
+                  {screenSize !== 'small' ? (
                      <PriceStatsCard
                         crypto={crypto}
                         historicalData={historicalData}
                      />
-                  </div>
-               )}
+                  ) : (
+                     <button onClick={() => setShowPopup(true)} className="view-price-stats-btn">
+                        View Price Charts and Key Stats
+                     </button>
+                  )}
+               </div>
                <div className="info-sections-container">
-                  <InfoSection title="About" content={crypto.description.en}>
-                     {screenSize === 'small' && (
-                        <button onClick={() => setShowPopup(true)} className="view-price-stats-btn">
-                           View Price Charts and Key Stats
-                        </button>
-                     )}
-                  </InfoSection>
+                  <InfoSection title="About" content={crypto.description.en} />
                   {contentfulData && (
                      <>
                      <InfoSection title="Educational Content" content={contentfulData.educationalContent || 'Coming soon...'} />

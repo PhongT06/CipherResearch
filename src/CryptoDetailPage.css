@@ -65,7 +65,7 @@
 
 .content-container {
    display: flex;
-   flex-direction: column;
+   flex-direction: row;
    gap: 2rem;
 }
 
@@ -73,6 +73,11 @@
    position: sticky;
    top: 2rem;
    align-self: flex-start;
+   width: 30%;
+}
+
+.info-sections-container {
+   width: 70%;
 }
 
 .info-section, .links-card, .price-stats-card {
@@ -161,12 +166,6 @@ h2 {
    background-color: #2980b9;
 }
 
-.price-stats-card-container {
-   position: sticky;
-   top: 2rem;
-   align-self: flex-start;
-}
-
 .price-stats-card {
    background-color: rgba(0, 0, 0, 0.7);
    border-radius: 10px;
@@ -231,6 +230,19 @@ h2 {
       font-size: 2rem;
    }
 
+   .crypto-detail-page.small .content-container {
+      flex-direction: column;
+   }
+
+   .crypto-detail-page.small .price-stats-card-container {
+      width: 100%;
+      position: static;
+   }
+
+   .crypto-detail-page.small .info-sections-container {
+      width: 100%;
+   }
+
    .crypto-detail-page.small .links-card .grid,
    .crypto-detail-page.small .stats-grid {
       grid-template-columns: 1fr;
@@ -240,12 +252,12 @@ h2 {
       height: 200px;
    }
 
-   h2 {
+   .crypto-detail-page.small h2 {
       font-size: 1.5rem;
    }
 
-   .content {
-      font-size: 1.125rem;
+   .crypto-detail-page.small .content {
+      font-size: 1rem;
    }
 }
 
