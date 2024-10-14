@@ -49,11 +49,14 @@ body {
 
 .crypto-list-header {
    position: sticky;
-   top: 118px; /* Adjust this value to match your navbar height */
+   top: 70px; /* Adjust this value to match your navbar height */
    background-color: white;
    z-index: 10;
    padding: 1rem 0;
    transition: box-shadow 0.3s ease;
+   height: 80px; /* Adjust this value to increase or decrease the height */
+   display: flex;
+   align-items: center;
 }
 
 .crypto-list-header.is-sticky {
@@ -62,6 +65,7 @@ body {
 
 .crypto-list-header-content {
    padding: 0 1rem;
+   width: 100%;
 }
 
 .crypto-list-grid {
@@ -121,4 +125,38 @@ body {
 
 .price-changed {
    animation: priceChange 1s ease-out;
+}
+
+@media (max-width: 768px) {
+   .crypto-list-grid {
+      grid-template-columns: 0.5fr 2fr 1.5fr 1.5fr;
+   }
+
+   .crypto-list-grid > div:nth-child(5),
+   .crypto-list-grid > div:nth-child(6) {
+      display: none;
+   }
+
+   .crypto-list-item {
+      padding: 0.5rem;
+   }
+
+   .crypto-image {
+      width: 1.5rem;
+      height: 1.5rem;
+   }
+
+   .crypto-list-header-content {
+      padding: 0 0.5rem;
+   }
+}
+
+@media (max-width: 480px) {
+   .crypto-list-grid {
+      grid-template-columns: 0.5fr 2fr 1.5fr;
+   }
+
+   .crypto-list-grid > div:nth-child(4) {
+      display: none;
+   }
 }

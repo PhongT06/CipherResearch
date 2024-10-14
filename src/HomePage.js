@@ -10,7 +10,7 @@ const CryptoList = ({ cryptos }) => {
    useEffect(() => {
       const handleScroll = () => {
          const headerTop = headerRef.current.getBoundingClientRect().top;
-         setIsSticky(headerTop <= 118); // 118px is the navbar height plus some padding
+         setIsSticky(headerTop <= 80); // Adjust this value to match your navbar height
       };
 
       window.addEventListener('scroll', handleScroll);
@@ -27,15 +27,23 @@ const CryptoList = ({ cryptos }) => {
          case 'ripple':
          case 'dogecoin':
          case 'the-open-network':
+         case 'binancecoin':
             return 'L1';
          case 'tether':
          case 'usd-coin':
             return 'Stablecoin';
-         case 'binancecoin':
-            return 'L1';
          default:
             return 'Other';
       }
+   };
+
+   const formatPrice = (price) => {
+      return new Intl.NumberFormat('en-US', {
+         style: 'currency',
+         currency: 'USD',
+         minimumFractionDigits: 2,
+         maximumFractionDigits: 2
+      }).format(price);
    };
 
    return (
@@ -74,7 +82,7 @@ const CryptoList = ({ cryptos }) => {
                            animate={{ scale: crypto.priceChange ? [1, 1.05, 1] : 1 }}
                            transition={{ duration: 0.3 }}
                         >
-                           ${crypto.current_price.toFixed(2)}
+                           {formatPrice(crypto.current_price)}
                         </motion.div>
                         <div className={`text-right ${crypto.price_change_percentage_24h >= 0 ? 'crypto-price-positive' : 'crypto-price-negative'}`}>
                            {crypto.price_change_percentage_24h.toFixed(2)}%
