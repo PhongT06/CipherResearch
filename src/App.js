@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import HomePage from './HomePage';
 import CryptoDetailPage from './CryptoDetailPage';
+import GlossaryPage from './GlossaryPage';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/crypto/:id" element={<CryptoDetailPage />} />
+            <Route path="/glossary" element={<GlossaryPage />} />
           </Routes>
         </main>
         <Footer />

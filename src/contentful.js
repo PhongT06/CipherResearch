@@ -39,3 +39,17 @@ export const getContentfulData = async (cryptoId) => {
       return null;
    }
 };
+
+export const getGlossaryTerms = async () => {
+   try {
+      console.log('Fetching glossary terms from Contentful');
+      const entries = await client.getEntries({
+         content_type: 'glossaryTerm',
+      });
+      console.log('Glossary terms fetched:', entries.items.length);
+      return entries.items;
+   } catch (error) {
+      console.error('Error fetching glossary terms from Contentful:', error);
+      return [];
+   }
+};
