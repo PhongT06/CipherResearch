@@ -491,3 +491,50 @@ h2 {
    color: #2ecc71;
    font-weight: bold;
 }
+
+ol {
+   list-style-type: decimal;
+   padding-left: 20px;
+   margin-bottom: 15px;
+}
+
+ol li {
+   margin-bottom: 10px;
+   padding-left: 10px;
+}
+
+ /* Reset counter for each ordered list */
+ol {
+   counter-reset: item;
+}
+
+ /* Use custom counter for list items */
+ol > li {
+   counter-increment: item;
+   display: block;
+}
+
+ol > li:before {
+   content: counter(item) ". ";
+   font-weight: bold;
+}
+
+.info-section ol {
+   list-style-type: decimal;
+   padding-left: 20px;
+   margin-bottom: 15px;
+}
+
+.info-section ol li {
+   margin-bottom: 10px;
+   padding-left: 10px;
+}
+
+.info-section ol li::marker {
+   font-weight: bold;
+}
+
+.info-section ol li p {
+   display: inline;
+   margin: 0;
+}

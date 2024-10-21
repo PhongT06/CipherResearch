@@ -17,19 +17,19 @@ export const getContentfulData = async (cryptoId) => {
          content_type: 'cryptocurrencyDetails',
          'fields.cryptoId': cryptoId,
       });
-      console.log('Contentful entries:', entries);
-
+      console.log('Raw Contentful entries:', JSON.stringify(entries, null, 2));
+   
       if (entries.items.length > 0) {
          const fields = entries.items[0].fields;
-         console.log('Fields found:', fields);
+         console.log('Raw fields:', JSON.stringify(fields, null, 2));
          return {
-         cryptoId: fields.cryptoId || '',
-         symbol: fields.symbol || '',
-         educationalContent: fields.educationalContent || '',
-         using: fields.using || '',
-         staking: fields.staking || '',
-         videoLinks: Array.isArray(fields.videoLinks) ? fields.videoLinks : [],
-         lastUpdated: fields.lastUpdated || new Date().toISOString(),
+            cryptoId: fields.cryptoId || '',
+            symbol: fields.symbol || '',
+            educationalContent: fields.educationalContent || '',
+            using: fields.using || '',
+            staking: fields.staking || '',
+            videoLinks: Array.isArray(fields.videoLinks) ? fields.videoLinks : [],
+            lastUpdated: fields.lastUpdated || new Date().toISOString(),
          };
       }
       console.log('No Contentful data found for:', cryptoId);

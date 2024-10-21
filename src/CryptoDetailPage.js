@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
-import { BLOCKS, INLINES } from '@contentful/rich-text-types';
+import { BLOCKS, INLINES, MARKS } from '@contentful/rich-text-types';
 import { getCryptoDetails, getCryptoHistoricalData } from './api';
 import { getContentfulData } from './contentful';
 import './CryptoDetailPage.css';
@@ -10,47 +10,88 @@ import PriceStatsPopup from './PriceStatsPopup';
 import PriceStatsCard from './PriceStatsCard';
 
 const formatPrice = (price) => {
-  if (price >= 1000) {
-    return new Intl.NumberFormat('en-US', {
+   if (price >= 1000) {
+      return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
-    }).format(price);
-  } else {
-    return new Intl.NumberFormat('en-US', {
+      }).format(price);
+   } else {
+      return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(price);
-  }
+      }).format(price);
+   }
 };
 
 const renderOptions = {
    renderNode: {
-      [BLOCKS.PARAGRAPH]: (node, children) => <p>{children}</p>,
-      [INLINES.HYPERLINK]: (node, children) => <a href={node.data.uri} target="_blank" rel="noopener noreferrer">{children}</a>,
+      [BLOCKS.PARAGRAPH]: (node, children) => {
+         if (children.length === 0) return null;
+         return <p>{children}</p>;
+      },
+      [BLOCKS.HEADING_1]: (node, children) => <h1>{children}</h1>,
+      [BLOCKS.HEADING_2]: (node, children) => <h2>{children}</h2>,
+      [BLOCKS.HEADING_3]: (node, children) => <h3>{children}</h3>,
+      [BLOCKS.UL_LIST]: (node, children) => <ul>{children}</ul>,
+      [BLOCKS.OL_LIST]: (node, children) => <ol>{children.filter(child => child !== null)}</ol>,
+      [BLOCKS.LIST_ITEM]: (node, children) => {
+         if (children.length === 0 || (children.length === 1 && children[0] === null)) return null;
+         // Remove the numbering from the content if it starts with a number followed by a dot
+         const content = children.map(child => {
+            if (typeof child === 'string') {
+            return child.replace(/^\d+\.\s*/, '');
+            }
+            return child;
+         });
+         return <li>{content}</li>;
+      },
+      [INLINES.HYPERLINK]: (node, children) => (
+         <a href={node.data.uri} target="_blank" rel="noopener noreferrer">
+            {children}
+         </a>
+      ),
+   },
+   renderMark: {
+      [MARKS.BOLD]: text => <strong>{text}</strong>,
+      [MARKS.ITALIC]: text => <em>{text}</em>,
+      [MARKS.UNDERLINE]: text => <u>{text}</u>,
    },
 };
 
-const InfoSection = ({ title, content, children }) => (
-   <motion.div 
-      className="info-section"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.5 }}
-   >
-      <h2>{title}</h2>
-      {children}
-      <div className="content">
-         {typeof content === 'string'
-         ? <div dangerouslySetInnerHTML={{ __html: content }} />
-         : documentToReactComponents(content, renderOptions)}
-      </div>
-   </motion.div>
-);
+const InfoSection = ({ title, content, children }) => {
+   console.log(`InfoSection '${title}' content:`, content);
+
+   const renderContent = () => {
+      if (typeof content === 'string') {
+         return <div dangerouslySetInnerHTML={{ __html: content }} />;
+      } else if (content && content.nodeType === 'document') {
+         return documentToReactComponents(content, renderOptions);
+      } else {
+         console.log('Unexpected content type:', content);
+         return <p>No content available</p>;
+      }
+   };
+
+   return (
+      <motion.div 
+         className="info-section"
+         initial={{ opacity: 0, y: 50 }}
+         whileInView={{ opacity: 1, y: 0 }}
+         viewport={{ once: true, amount: 0.3 }}
+         transition={{ duration: 0.5 }}
+      >
+         <h2>{title}</h2>
+         {children}
+         <div className="content">
+            {renderContent()}
+         </div>
+      </motion.div>
+   );
+};
 
 const CryptoDetailPage = () => {
    const { id } = useParams();
@@ -87,6 +128,9 @@ const CryptoDetailPage = () => {
                getCryptoHistoricalData(id)
             ]);
             
+            console.log('Contentful full response:', JSON.stringify(contentfulResponse, null, 2));
+            console.log('Contentful using field:', JSON.stringify(contentfulResponse.using, null, 2));
+      
             setCrypto(apiResponse);
             setContentfulData(contentfulResponse);
             
