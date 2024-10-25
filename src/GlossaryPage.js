@@ -50,7 +50,7 @@ const GlossaryPage = () => {
    };
 
    return (
-      <div className="min-h-screen bg-gray-900 text-white">
+      <div className="min-h-screen bg-black text-white">
          <div className="max-w-4xl mx-auto px-4 py-8">
          <motion.h1 
             className="text-4xl font-bold mb-8 text-center"

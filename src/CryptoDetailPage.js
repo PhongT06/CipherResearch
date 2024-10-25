@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
 import { BLOCKS, INLINES, MARKS } from '@contentful/rich-text-types';
 import { getCryptoDetails, getCryptoHistoricalData } from './api';
-import { getContentfulData } from './contentful';
+import { getContentfulData, CRYPTO_SECTIONS, SECTION_NAMES } from './contentful';
 import './CryptoDetailPage.css';
 import PriceStatsPopup from './PriceStatsPopup';
 import PriceStatsCard from './PriceStatsCard';
@@ -12,17 +12,17 @@ import PriceStatsCard from './PriceStatsCard';
 const formatPrice = (price) => {
    if (price >= 1000) {
       return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+         style: 'currency',
+         currency: 'USD',
+         minimumFractionDigits: 0,
+         maximumFractionDigits: 0
       }).format(price);
    } else {
       return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+         style: 'currency',
+         currency: 'USD',
+         minimumFractionDigits: 2,
+         maximumFractionDigits: 2
       }).format(price);
    }
 };
@@ -40,10 +40,9 @@ const renderOptions = {
       [BLOCKS.OL_LIST]: (node, children) => <ol>{children.filter(child => child !== null)}</ol>,
       [BLOCKS.LIST_ITEM]: (node, children) => {
          if (children.length === 0 || (children.length === 1 && children[0] === null)) return null;
-         // Remove the numbering from the content if it starts with a number followed by a dot
          const content = children.map(child => {
             if (typeof child === 'string') {
-            return child.replace(/^\d+\.\s*/, '');
+               return child.replace(/^\d+\.\s*/, '');
             }
             return child;
          });
@@ -72,9 +71,12 @@ const InfoSection = ({ title, content, children }) => {
          return documentToReactComponents(content, renderOptions);
       } else {
          console.log('Unexpected content type:', content);
-         return <p>No content available</p>;
+         return null; // Changed from "No content available" to null to hide empty sections
       }
    };
+
+   const contentToRender = renderContent();
+   if (!contentToRender && !children) return null; // Don't render section if no content
 
    return (
       <motion.div 
@@ -87,7 +89,7 @@ const InfoSection = ({ title, content, children }) => {
          <h2>{title}</h2>
          {children}
          <div className="content">
-            {renderContent()}
+            {contentToRender}
          </div>
       </motion.div>
    );
@@ -129,8 +131,7 @@ const CryptoDetailPage = () => {
             ]);
             
             console.log('Contentful full response:', JSON.stringify(contentfulResponse, null, 2));
-            console.log('Contentful using field:', JSON.stringify(contentfulResponse.using, null, 2));
-      
+            
             setCrypto(apiResponse);
             setContentfulData(contentfulResponse);
             
@@ -154,6 +155,22 @@ const CryptoDetailPage = () => {
 
       fetchData();
    }, [id]);
+
+   const renderContentSections = () => {
+      if (!contentfulData || !contentfulData.sections) return null;
+
+      return CRYPTO_SECTIONS.map(sectionKey => {
+         if (!contentfulData.sections[sectionKey]) return null;
+
+         return (
+            <InfoSection 
+               key={sectionKey}
+               title={SECTION_NAMES[sectionKey]}
+               content={contentfulData.sections[sectionKey]}
+            />
+         );
+      });
+   };
 
    if (loading) return <div className="loading">Loading...</div>;
    if (error) return <div className="error">{error}</div>;
@@ -191,27 +208,21 @@ const CryptoDetailPage = () => {
                </div>
                <div className="info-sections-container">
                   <InfoSection title="About" content={crypto.description.en} />
-                  {contentfulData && (
-                     <>
-                     <InfoSection title="Educational Content" content={contentfulData.educationalContent || 'Coming soon...'} />
-                     <InfoSection title={`Using ${crypto.name}`} content={contentfulData.using || 'Coming soon...'} />
-                     <InfoSection title={`Staking ${crypto.name}`} content={contentfulData.staking || 'Coming soon...'} />
-                     </>
-                  )}
+                  {renderContentSections()}
                   {contentfulData && contentfulData.videoLinks && contentfulData.videoLinks.length > 0 && (
                      <InfoSection
-                     title="Helpful Videos"
-                     content={
-                        <ul>
-                           {contentfulData.videoLinks.map((link, index) => (
-                           <li key={index}>
-                              <a href={link.url} target="_blank" rel="noopener noreferrer">
-                                 {link.title}
-                              </a>
-                           </li>
-                           ))}
-                        </ul>
-                     }
+                        title="Helpful Videos"
+                        content={
+                           <ul>
+                              {contentfulData.videoLinks.map((link, index) => (
+                                 <li key={index}>
+                                    <a href={link.url} target="_blank" rel="noopener noreferrer">
+                                       {link.title}
+                                    </a>
+                                 </li>
+                              ))}
+                           </ul>
+                        }
                      />
                   )}
                   <motion.div 
@@ -223,26 +234,26 @@ const CryptoDetailPage = () => {
                   >
                      <h2>Links</h2>
                      <div className="grid grid-cols-2 gap-4">
-                     {crypto.links.homepage[0] && (
-                        <a href={crypto.links.homepage[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                           Official Website
-                        </a>
-                     )}
-                     {crypto.links.blockchain_site[0] && (
-                        <a href={crypto.links.blockchain_site[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                           Blockchain Explorer
-                        </a>
-                     )}
-                     {crypto.links.official_forum_url[0] && (
-                        <a href={crypto.links.official_forum_url[0]} target="_blank" rel="noopener noreferrer" className="link-button">
-                           Official Forum
-                        </a>
-                     )}
-                     {crypto.links.subreddit_url && (
-                        <a href={crypto.links.subreddit_url} target="_blank" rel="noopener noreferrer" className="link-button">
-                           Reddit
-                        </a>
-                     )}
+                        {crypto.links.homepage[0] && (
+                           <a href={crypto.links.homepage[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                              Official Website
+                           </a>
+                        )}
+                        {crypto.links.blockchain_site[0] && (
+                           <a href={crypto.links.blockchain_site[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                              Blockchain Explorer
+                           </a>
+                        )}
+                        {crypto.links.official_forum_url[0] && (
+                           <a href={crypto.links.official_forum_url[0]} target="_blank" rel="noopener noreferrer" className="link-button">
+                              Official Forum
+                           </a>
+                        )}
+                        {crypto.links.subreddit_url && (
+                           <a href={crypto.links.subreddit_url} target="_blank" rel="noopener noreferrer" className="link-button">
+                              Reddit
+                           </a>
+                        )}
                      </div>
                   </motion.div>
                </div>
@@ -250,12 +261,12 @@ const CryptoDetailPage = () => {
          </div>
          
          {screenSize === 'small' && showPopup && (
-         <PriceStatsPopup
-            crypto={crypto}
-            historicalData={historicalData}
-            onClose={() => setShowPopup(false)}
-            formatPrice={formatPrice}
-         />
+            <PriceStatsPopup
+               crypto={crypto}
+               historicalData={historicalData}
+               onClose={() => setShowPopup(false)}
+               formatPrice={formatPrice}
+            />
          )}
       </div>
    );
