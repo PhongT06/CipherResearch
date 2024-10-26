@@ -8,6 +8,7 @@ import { getContentfulData, CRYPTO_SECTIONS, SECTION_NAMES } from './contentful'
 import './CryptoDetailPage.css';
 import PriceStatsPopup from './PriceStatsPopup';
 import PriceStatsCard from './PriceStatsCard';
+import { richTextRenderOptions } from './utils/contentUtils';
 
 const formatPrice = (price) => {
    if (price >= 1000) {
@@ -68,10 +69,10 @@ const InfoSection = ({ title, content, children }) => {
       if (typeof content === 'string') {
          return <div dangerouslySetInnerHTML={{ __html: content }} />;
       } else if (content && content.nodeType === 'document') {
-         return documentToReactComponents(content, renderOptions);
+         return documentToReactComponents(content, richTextRenderOptions);
       } else {
          console.log('Unexpected content type:', content);
-         return null; // Changed from "No content available" to null to hide empty sections
+         return null;
       }
    };
 

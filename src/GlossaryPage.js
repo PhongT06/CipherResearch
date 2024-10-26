@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
 import { getGlossaryTerms } from './contentful';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const GlossaryPage = () => {
    const [terms, setTerms] = useState([]);
@@ -10,6 +11,11 @@ const GlossaryPage = () => {
    const [searchTerm, setSearchTerm] = useState('');
    const [selectedLetter, setSelectedLetter] = useState('#');
    const [loading, setLoading] = useState(true);
+   const [searchComplete, setSearchComplete] = useState(false);
+   const [lastSearch, setLastSearch] = useState('');
+   const location = useLocation();
+   const termRefs = useRef({});
+   const clearTimeoutRef = useRef(null);
 
    useEffect(() => {
       const fetchTerms = async () => {
@@ -20,6 +26,34 @@ const GlossaryPage = () => {
             );
             setTerms(sortedTerms);
             setFilteredTerms(sortedTerms);
+
+            // Check for term parameter in URL
+            const params = new URLSearchParams(location.search);
+            const termParam = params.get('term');
+            if (termParam) {
+               const decodedTerm = decodeURIComponent(termParam);
+               setSearchTerm(decodedTerm);
+               // Filter terms to show only the matching term
+               const matchingTerms = sortedTerms.filter(term => 
+                  term.fields.term.toLowerCase() === decodedTerm.toLowerCase()
+               );
+               setFilteredTerms(matchingTerms);
+
+               // Set the letter to match the first letter of the term
+               if (matchingTerms.length > 0) {
+                  const firstLetter = matchingTerms[0].fields.term[0].toUpperCase();
+                  setSelectedLetter(firstLetter);
+               }
+
+               // Scroll to term after a short delay to ensure rendering
+               setTimeout(() => {
+                  const termElement = termRefs.current[decodedTerm.toLowerCase()];
+                  if (termElement) {
+                     termElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                     termElement.classList.add('highlight-term');
+                  }
+               }, 500);
+            }
          } catch (error) {
             console.error('Error fetching glossary terms:', error);
          } finally {
@@ -27,22 +61,66 @@ const GlossaryPage = () => {
          }
       };
       fetchTerms();
-   }, []);
 
-   const handleSearch = () => {
+      // Cleanup function to clear any pending timeouts
+      return () => {
+         if (clearTimeoutRef.current) {
+            clearTimeout(clearTimeoutRef.current);
+         }
+      };
+   }, [location]);
+
+   useEffect(() => {
+      if (!searchTerm && selectedLetter === '#') {
+         setFilteredTerms(terms);
+         return;
+      }
+
       const filtered = terms.filter(term => {
-         const matchesSearch = searchTerm === '' || 
+         const matchesSearch = !searchTerm || 
             term.fields.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (term.fields.definition.content && 
-             term.fields.definition.content.some(content => 
-               content.content && content.content.some(item => 
-                 item.value && item.value.toLowerCase().includes(searchTerm.toLowerCase())
+            term.fields.definition.content?.some(content =>
+               content.content?.some(item =>
+                  item.value?.toLowerCase().includes(searchTerm.toLowerCase())
                )
-             ));
-         const matchesLetter = selectedLetter === '#' || term.fields.term[0].toUpperCase() === selectedLetter;
+            );
+
+         const matchesLetter = selectedLetter === '#' || 
+            term.fields.term[0].toUpperCase() === selectedLetter;
+
          return matchesSearch && matchesLetter;
       });
+
       setFilteredTerms(filtered);
+   }, [searchTerm, selectedLetter, terms]);
+
+   const handleSearch = () => {
+      setSearchComplete(true);
+      setLastSearch(searchTerm);
+
+      // Clear any existing timeout
+      if (clearTimeoutRef.current) {
+         clearTimeout(clearTimeoutRef.current);
+      }
+
+      // Set new timeout for auto-clear
+      clearTimeoutRef.current = setTimeout(() => {
+         setSearchTerm('');
+         setSearchComplete(false);
+      }, 2000);
+   };
+
+   const clearSearch = () => {
+      setSearchTerm('');
+      setSelectedLetter('#');
+      setFilteredTerms(terms);
+      setSearchComplete(false);
+      setLastSearch('');
+      
+      // Clear any pending auto-clear timeout
+      if (clearTimeoutRef.current) {
+         clearTimeout(clearTimeoutRef.current);
+      }
    };
 
    const handleKeyPress = (e) => {
@@ -51,10 +129,12 @@ const GlossaryPage = () => {
       }
    };
 
-   // Update search results when letter is changed
-   useEffect(() => {
-      handleSearch();
-   }, [selectedLetter]); // eslint-disable-line react-hooks/exhaustive-deps
+   const handleLetterClick = (letter) => {
+      setSelectedLetter(letter);
+      if (letter === '#') {
+         clearSearch();
+      }
+   };
 
    const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -87,14 +167,24 @@ const GlossaryPage = () => {
                transition={{ delay: 0.2, duration: 0.5 }}
             >
                <div className="flex gap-2">
-                  <input
-                     type="text"
-                     placeholder="Search terms..."
-                     className="w-full p-2 bg-gray-800 rounded-l border border-gray-700 focus:outline-none focus:border-blue-500"
-                     value={searchTerm}
-                     onChange={(e) => setSearchTerm(e.target.value)}
-                     onKeyPress={handleKeyPress}
-                  />
+                  <div className="relative flex-1">
+                     <input
+                        type="text"
+                        placeholder="Search terms..."
+                        className="w-full p-2 pr-8 bg-gray-800 rounded-l border border-gray-700 focus:outline-none focus:border-blue-500"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                     />
+                     {searchTerm && (
+                        <button
+                           onClick={clearSearch}
+                           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
+                        >
+                           <X size={16} />
+                        </button>
+                     )}
+                  </div>
                   <button
                      onClick={handleSearch}
                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-r flex items-center justify-center transition-colors duration-200"
@@ -102,6 +192,11 @@ const GlossaryPage = () => {
                      <Search className="w-5 h-5" />
                   </button>
                </div>
+               {lastSearch && (
+                  <div className="text-sm text-gray-400 mt-2">
+                     Showing results for: "{lastSearch}"
+                  </div>
+               )}
             </motion.div>
 
             <motion.div 
@@ -116,7 +211,7 @@ const GlossaryPage = () => {
                      className={`px-3 py-1 rounded ${
                         selectedLetter === letter ? 'bg-blue-600' : 'bg-gray-800'
                      } hover:bg-blue-500 transition-colors duration-200`}
-                     onClick={() => setSelectedLetter(letter)}
+                     onClick={() => handleLetterClick(letter)}
                      whileHover={{ scale: 1.1 }}
                      whileTap={{ scale: 0.95 }}
                   >
@@ -133,6 +228,7 @@ const GlossaryPage = () => {
                      {filteredTerms.map((term) => (
                         <motion.div
                            key={term.sys.id}
+                           ref={el => termRefs.current[term.fields.term.toLowerCase()] = el}
                            layout
                            initial={{ opacity: 0, y: 20 }}
                            animate={{ opacity: 1, y: 0 }}

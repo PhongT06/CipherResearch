@@ -160,3 +160,18 @@ body {
       display: none;
    }
 }
+
+/* Glossary term highlighting */
+.highlight-term {
+   animation: highlight 2s ease-out forwards;
+}
+
+/* Glossary link styling */
+.info-section a[href^="/glossary"] {
+   transition: color 0.2s ease-in-out;
+}
+
+.info-section a[href^="/glossary"]:hover {
+   color: #60A5FA; /* Lighter blue on hover */
+   text-decoration: underline;
+}
